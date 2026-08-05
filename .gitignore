@@ -1,0 +1,13 @@
+/.idea/
+# ClaudeSkillCommon deploy (auto-added)
+.agents/
+.claude/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
