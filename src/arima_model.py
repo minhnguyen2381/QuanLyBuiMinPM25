@@ -146,7 +146,9 @@ def forecast_arima(
         try:
             model = ARIMA(history, order=order)
             fit   = model.fit()
-            yhat  = float(fit.forecast(steps=1).iloc[0])
+            # statsmodels trả về Series hoặc ndarray tùy kiểu dữ liệu đầu vào.
+            # Dùng NumPy để lấy phần tử đầu tiên an toàn cho cả hai trường hợp.
+            yhat = float(np.asarray(fit.forecast(steps=1)).reshape(-1)[0])
         except Exception as e:
             logger.warning(f"Lỗi tại {date}: {e}. Dùng giá trị cuối.")
             yhat = history[-1]
