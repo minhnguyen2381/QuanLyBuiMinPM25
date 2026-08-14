@@ -1,0 +1,25 @@
+include_exogenous: true
+lags: [1, 2, 3, 7, 14, 21, 30]
+rolling_windows: [3, 7, 14, 30]
+add_calendar_features: true
+add_cyclic_features: true
+add_diff_features: true
+
+model:
+  n_estimators: 300
+  max_depth: 12
+  min_samples_leaf: 2
+  random_state: 42
+  n_jobs: -1
+
+search:
+  enabled: true
+  n_iter: 20
+  cv_splits: 5
+  scoring: neg_root_mean_squared_error
+  random_state: 42
+  param_distributions:
+    n_estimators: [100, 200, 300, 500]
+    max_depth: [5, 10, 15, null]
+    min_samples_leaf: [1, 2, 4]
+    max_features: [sqrt, 0.7, 1.0]

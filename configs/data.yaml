@@ -1,0 +1,39 @@
+raw_dir: data/raw
+processed_dir: data/processed
+clean_path: data/processed/clean_data_multivariate.csv
+metadata_path: data/metadata/data_quality_report.csv
+
+date_col: date
+target_col: PM2.5
+min_obs_per_day: 12
+interpolate_limit_days: 7
+
+date_candidates:
+  - local time
+  - datetime
+  - timestamp
+  - date
+  - time
+
+target_candidates:
+  - pm2.5
+  - pm25
+  - pm_2_5
+
+exogenous_candidates:
+  - AQI
+  - CO
+  - NO2
+  - O3
+  - PM10
+  - SO2
+  - Clouds
+  - Precipitation
+  - Pressure
+  - Relative Humidity
+  - Temperature
+  - UV Index
+  - Wind Speed
+
+train_end_year: 2024
+test_start_year: 2025
