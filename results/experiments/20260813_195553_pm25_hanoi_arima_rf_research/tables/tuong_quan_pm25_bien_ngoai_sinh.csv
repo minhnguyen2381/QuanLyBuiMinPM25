@@ -1,0 +1,14 @@
+﻿,Tương quan với PM2.5
+AQI,0.859
+PM10,0.6648
+Pressure,0.429
+NO2,0.4206
+Temperature,-0.3736
+Relative Humidity,-0.24
+SO2,0.2376
+Wind Speed,-0.2371
+Precipitation,-0.2253
+Clouds,-0.1065
+UV Index,0.0658
+CO,-0.0175
+O3,0.0056

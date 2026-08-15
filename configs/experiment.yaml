@@ -1,0 +1,19 @@
+experiment_name: pm25_hanoi_arima_rf_research
+random_state: 42
+
+results_dir: results
+predictions_dir: results/predictions
+experiments_dir: results/experiments
+figures_dir: figures
+
+baselines:
+  naive: true
+  seasonal_naive_7: true
+
+metrics:
+  - MAE
+  - RMSE
+  - MAPE
+  - SMAPE
+  - R2
+  - DirectionalAccuracy

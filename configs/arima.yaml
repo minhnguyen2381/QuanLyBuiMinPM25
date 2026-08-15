@@ -1,0 +1,6 @@
+p_range: [0, 1, 2, 3]
+d_range: [0, 1]
+q_range: [0, 1, 2, 3]
+information_criterion: aic
+rolling_forecast: true
+max_test_points: null
