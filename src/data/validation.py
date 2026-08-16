@@ -1,4 +1,8 @@
-"""Data quality summaries for repeatable research reporting."""
+"""Tạo bảng kiểm tra chất lượng dữ liệu trước và sau tiền xử lý.
+
+Các thống kê ở đây giúp báo cáo giải thích được dữ liệu đã thay đổi thế nào:
+số dòng thô, số ngày sạch, khoảng thời gian, số giá trị thiếu và số dòng trùng.
+"""
 
 from __future__ import annotations
 
@@ -6,7 +10,11 @@ import pandas as pd
 
 
 def build_quality_report(raw: pd.DataFrame, clean: pd.DataFrame, config: dict) -> pd.DataFrame:
-    """Create a compact before/after quality report."""
+    """Tạo bảng so sánh chất lượng dữ liệu thô và dữ liệu sạch.
+
+    Bảng trả về có ba cột: tên chỉ tiêu, giá trị trước tiền xử lý và giá trị sau
+    tiền xử lý. Đây là artifact để lưu ra CSV và đưa vào phần mô tả dữ liệu.
+    """
     target = config["target_col"]
     rows = [
         ("raw_rows", len(raw), None),

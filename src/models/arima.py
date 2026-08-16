@@ -1,4 +1,8 @@
-"""ARIMA utilities for selection, fitting, and rolling forecasts."""
+"""Các hàm hỗ trợ mô hình ARIMA cho dự báo PM2.5 đơn biến.
+
+ARIMA dùng chính lịch sử PM2.5 để dự báo tương lai. Module này kiểm tra tính
+dừng, chọn bộ tham số `(p, d, q)`, rồi dự báo cuốn chiếu từng ngày trên tập test.
+"""
 
 from __future__ import annotations
 
@@ -17,7 +21,12 @@ warnings.filterwarnings("ignore", message="Non-invertible starting MA parameters
 
 
 def adf_test(series: pd.Series, significance: float = 0.05) -> dict:
-    """Run Augmented Dickey-Fuller stationarity test."""
+    """Chạy kiểm định Augmented Dickey-Fuller để xem chuỗi có tính dừng không.
+
+    Với người mới: p-value nhỏ hơn `significance` thường được hiểu là có đủ bằng
+    chứng để xem chuỗi đã dừng. Kết quả này giúp giải thích vì sao ARIMA cần
+    tham số sai phân `d`.
+    """
     clean = series.dropna()
     stat, p_value, _, _, critical_values, _ = adfuller(clean)
     return {
@@ -35,7 +44,12 @@ def select_arima_order(
     q_values: Iterable[int],
     information_criterion: str = "aic",
 ) -> tuple[tuple[int, int, int], pd.DataFrame]:
-    """Grid-search ARIMA order using only the training series."""
+    """Thử nhiều bộ `(p, d, q)` và chọn bộ có tiêu chí AIC/BIC tốt nhất.
+
+    Hàm chỉ dùng chuỗi huấn luyện để tránh rò rỉ dữ liệu kiểm thử. Mỗi cấu hình
+    được lưu vào bảng kết quả; nếu một cấu hình fit lỗi, lỗi được ghi lại thay
+    vì làm dừng toàn bộ quá trình tìm kiếm.
+    """
     rows = []
     best_score = np.inf
     best_order = (1, 1, 1)
@@ -58,7 +72,12 @@ def select_arima_order(
 
 
 def rolling_arima_forecast(train: pd.Series, test: pd.Series, order: tuple[int, int, int]) -> pd.Series:
-    """One-step-ahead rolling ARIMA forecast."""
+    """Dự báo ARIMA kiểu cuốn chiếu từng bước một ngày.
+
+    Mỗi vòng lặp fit ARIMA trên lịch sử hiện có, dự báo ngày kế tiếp, rồi thêm
+    giá trị thực tế của ngày đó vào lịch sử. Cách này mô phỏng tình huống thực
+    tế: sau mỗi ngày, ta biết thêm dữ liệu thật và có thể cập nhật mô hình.
+    """
     history = [float(v) for v in train.dropna()]
     predictions = []
 

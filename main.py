@@ -1,4 +1,8 @@
-"""Chạy pipeline nghiên cứu dự báo PM2.5 tại Hà Nội.
+"""Điểm bắt đầu để chạy toàn bộ nghiên cứu dự báo PM2.5 tại Hà Nội.
+
+File này chỉ làm nhiệm vụ "bấm nút chạy": cấu hình logging, gọi pipeline chính
+trong `src.pipeline`, rồi in ra các đường dẫn và kết quả quan trọng. Toàn bộ xử
+lý dữ liệu, huấn luyện mô hình và lưu bảng/hình nằm trong các module `src`.
 
 Sử dụng:
     python main.py
@@ -15,7 +19,12 @@ from src.pipeline import run_research_pipeline
 
 
 def run_pipeline() -> None:
-    """Chạy thực nghiệm ARIMA và Random Forest, sau đó in tóm tắt kết quả."""
+    """Chạy thực nghiệm và in tóm tắt để người dùng biết kết quả nằm ở đâu.
+
+    Hàm này không tự xử lý dữ liệu. Nó gọi `run_research_pipeline()`, nhận lại
+    một dict kết quả, rồi in các thông tin dễ kiểm tra như mã thực nghiệm, thư
+    mục output, bộ tham số ARIMA và tham số Random Forest tốt nhất.
+    """
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")

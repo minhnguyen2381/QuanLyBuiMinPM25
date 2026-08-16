@@ -1,4 +1,9 @@
-"""Research-grade PM2.5 forecasting pipeline."""
+"""Pipeline chính cho nghiên cứu dự báo PM2.5.
+
+File này nối các module nhỏ thành một quy trình hoàn chỉnh: đọc config, đọc dữ
+liệu thô, tiền xử lý, tạo bảng/hình EDA, huấn luyện ARIMA và Random Forest,
+đánh giá mô hình, rồi lưu toàn bộ artifact vào thư mục kết quả.
+"""
 
 from __future__ import annotations
 
@@ -58,7 +63,11 @@ def _write_series(series: pd.Series, path: Path) -> Path:
 
 
 def _display_model_names() -> dict[str, str]:
-    """Tên mô hình dùng trong bảng và hình để tránh dịch máy móc."""
+    """Trả về tên hiển thị tiếng Việt cho bảng và hình.
+
+    Tên nội bộ như `Naive` hoặc `SeasonalNaive7` tiện cho code, nhưng trong báo
+    cáo nên dùng nhãn dễ đọc hơn cho người xem không quen thuật ngữ.
+    """
     return {
         "Naive": "Mô hình tham chiếu (Naive)",
         "SeasonalNaive7": "Tham chiếu mùa vụ 7 ngày",
@@ -68,7 +77,13 @@ def _display_model_names() -> dict[str, str]:
 
 
 def run_research_pipeline(configs: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
-    """Chạy toàn bộ thực nghiệm ARIMA và Random Forest, đồng thời lưu bảng/hình báo cáo."""
+    """Chạy toàn bộ thực nghiệm ARIMA và Random Forest.
+
+    Hàm này là trung tâm của project. Nó nhận cấu hình, tạo thư mục kết quả cho
+    lần chạy, xử lý dữ liệu, huấn luyện hai mô hình chính, so sánh với mô hình
+    tham chiếu, lưu CSV/PNG và trả về một dict tóm tắt để `main.py` in ra màn
+    hình.
+    """
     configs = configs or load_project_configs()
     data_cfg = configs["data"]
     arima_cfg = configs["arima"]
@@ -92,7 +107,7 @@ def run_research_pipeline(configs: dict[str, dict[str, Any]] | None = None) -> d
     table_dir = exp_dir / "tables"
     figure_dir = exp_dir / "figures"
 
-    # Các bảng thống kê này giúp phần kết quả không chỉ dựa vào metric mô hình.
+    # Nhóm bảng EDA giúp báo cáo hiểu dữ liệu trước khi nhìn vào metric mô hình.
     save_table(descriptive_statistics(clean), table_dir / "thong_ke_mo_ta.csv")
     save_table(missing_data_summary(clean), table_dir / "du_lieu_thieu_sau_tien_xu_ly.csv")
     save_table(pm25_correlation_table(clean, target), table_dir / "tuong_quan_pm25_bien_ngoai_sinh.csv")
@@ -100,7 +115,7 @@ def run_research_pipeline(configs: dict[str, dict[str, Any]] | None = None) -> d
     for name, table in temporal_statistics(clean, target).items():
         save_table(table, table_dir / f"thong_ke_pm25_theo_{name}.csv")
 
-    # Bộ biểu đồ EDA được sinh lại từ pipeline mới, thay cho các hình notebook cũ.
+    # Sinh lại biểu đồ EDA bằng code để mỗi lần chạy đều có artifact nhất quán.
     plot_pm25_time_series(clean, target, figure_dir / "01_dien_bien_pm25.png")
     plot_pm25_distribution(clean, target, figure_dir / "02_phan_phoi_pm25.png")
     plot_monthly_boxplot(clean, target, figure_dir / "03_boxplot_pm25_theo_thang.png")

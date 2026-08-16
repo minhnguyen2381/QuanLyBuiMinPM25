@@ -1,4 +1,9 @@
-"""Feature engineering for time-series supervised learning."""
+"""Tạo đặc trưng cho bài toán dự báo chuỗi thời gian PM2.5.
+
+Random Forest không tự hiểu thứ tự thời gian như ARIMA. Vì vậy module này biến
+chuỗi PM2.5 theo ngày thành bảng học có giám sát: mỗi dòng là một ngày, các cột
+đặc trưng lấy từ quá khứ, và cột mục tiêu là PM2.5 của ngày cần dự báo.
+"""
 
 from __future__ import annotations
 
@@ -7,7 +12,11 @@ import pandas as pd
 
 
 def month_to_season(month: int) -> int:
-    """Map month to Hanoi seasons encoded as 1..4."""
+    """Đổi tháng thành mã mùa đơn giản của Hà Nội.
+
+    Mã 1..4 giúp mô hình học yếu tố mùa vụ bằng số: xuân, hè, thu, đông. Đây là
+    cách biểu diễn gọn để Random Forest dùng được thông tin tháng trong năm.
+    """
     if month in (3, 4, 5):
         return 1
     if month in (6, 7, 8):
@@ -18,7 +27,14 @@ def month_to_season(month: int) -> int:
 
 
 def create_supervised_features(clean: pd.DataFrame, config: dict) -> tuple[pd.DataFrame, pd.Series, list[str]]:
-    """Create lag, rolling, calendar, and optional exogenous features."""
+    """Tạo bảng đặc trưng đầu vào cho Random Forest.
+
+    Hàm sinh các nhóm đặc trưng chính: giá trị PM2.5 các ngày trước (`lag`),
+    trung bình/độ lệch chuẩn trượt từ quá khứ (`rolling`), đặc trưng lịch và
+    biến ngoại sinh đã dịch lùi một ngày. Việc dùng `shift(1)` rất quan trọng:
+    mô hình chỉ được nhìn dữ liệu quá khứ, không được nhìn trước giá trị của
+    ngày đang cần dự báo.
+    """
     target = config["target_col"]
     rf_cfg = config["random_forest"]
     y = clean[target]

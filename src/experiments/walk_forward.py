@@ -1,4 +1,8 @@
-"""Walk-forward splitting utilities for time-series experiments."""
+"""Tạo các lần chia walk-forward cho thực nghiệm chuỗi thời gian.
+
+Walk-forward mô phỏng cách dự báo thực tế: huấn luyện trên quá khứ, kiểm thử
+trên giai đoạn kế tiếp, sau đó mở rộng tập huấn luyện và lặp lại.
+"""
 
 from __future__ import annotations
 
@@ -20,7 +24,12 @@ def expanding_monthly_splits(
     initial_train_end: str,
     horizon_months: int = 1,
 ) -> list[TimeSplit]:
-    """Create expanding-window monthly splits for research-grade evaluation."""
+    """Tạo danh sách split theo tháng với cửa sổ huấn luyện mở rộng dần.
+
+    `initial_train_end` là ngày kết thúc train ban đầu. Mỗi split tiếp theo lấy
+    một khoảng test dài `horizon_months`, rồi đưa khoảng đó vào lịch sử cho lần
+    chia kế tiếp.
+    """
     train_start = index.min()
     current_train_end = pd.Timestamp(initial_train_end)
     splits: list[TimeSplit] = []

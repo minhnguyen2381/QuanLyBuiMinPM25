@@ -1,1 +1,1 @@
-"""Data ingestion, validation, preprocessing, and feature engineering."""
+"""Nhóm module xử lý dữ liệu: đọc thô, kiểm tra, tiền xử lý và tạo đặc trưng."""

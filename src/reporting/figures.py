@@ -1,4 +1,4 @@
-"""Sinh biểu đồ tiếng Việt cho pipeline nghiên cứu PM2.5."""
+"""Sinh các biểu đồ tiếng Việt cho pipeline nghiên cứu PM2.5."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ VIETNAMESE_LABELS = {
 
 
 def _save(fig: plt.Figure, output_path: str | Path) -> Path:
-    """Lưu biểu đồ với cấu hình thống nhất."""
+    """Lưu biểu đồ ra file và đóng figure để tránh tốn bộ nhớ."""
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, dpi=160, bbox_inches="tight")
@@ -28,7 +28,7 @@ def _save(fig: plt.Figure, output_path: str | Path) -> Path:
 
 
 def plot_forecast_comparison(actual: pd.Series, predictions: dict[str, pd.Series], output_path: str | Path) -> Path:
-    """Vẽ chuỗi PM2.5 thực tế và dự báo của các mô hình."""
+    """Vẽ đường PM2.5 thực tế cùng dự báo của các mô hình trên cùng trục thời gian."""
     fig, ax = plt.subplots(figsize=(14, 5))
     ax.plot(actual.index, actual.values, label="Thực tế", color="#222222", linewidth=1.3)
     for name, pred in predictions.items():
@@ -42,7 +42,7 @@ def plot_forecast_comparison(actual: pd.Series, predictions: dict[str, pd.Series
 
 
 def plot_pm25_time_series(clean: pd.DataFrame, target_col: str, output_path: str | Path) -> Path:
-    """Vẽ diễn biến PM2.5 toàn giai đoạn."""
+    """Vẽ diễn biến PM2.5 toàn giai đoạn để thấy xu hướng và các đợt tăng cao."""
     fig, ax = plt.subplots(figsize=(14, 4.8))
     ax.plot(clean.index, clean[target_col], color="#2563eb", linewidth=0.9)
     ax.axhline(clean[target_col].mean(), color="#dc2626", linestyle="--", linewidth=1.0, label="Trung bình toàn kỳ")
@@ -55,7 +55,7 @@ def plot_pm25_time_series(clean: pd.DataFrame, target_col: str, output_path: str
 
 
 def plot_pm25_distribution(clean: pd.DataFrame, target_col: str, output_path: str | Path) -> Path:
-    """Vẽ phân phối PM2.5 để nhận diện độ lệch và các đỉnh ô nhiễm."""
+    """Vẽ histogram/KDE để nhận diện phân phối, độ lệch và các mức PM2.5 phổ biến."""
     fig, ax = plt.subplots(figsize=(9, 5))
     sns.histplot(clean[target_col].dropna(), bins=45, kde=True, color="#16a34a", ax=ax)
     ax.axvline(clean[target_col].mean(), color="#dc2626", linestyle="--", label=f"Trung bình: {clean[target_col].mean():.2f}")
@@ -69,7 +69,7 @@ def plot_pm25_distribution(clean: pd.DataFrame, target_col: str, output_path: st
 
 
 def plot_monthly_boxplot(clean: pd.DataFrame, target_col: str, output_path: str | Path) -> Path:
-    """Vẽ boxplot PM2.5 theo tháng để làm rõ tính mùa vụ."""
+    """Vẽ boxplot theo tháng để so sánh trung vị, độ phân tán và ngoại lệ mùa vụ."""
     data = clean[[target_col]].copy()
     data["Tháng"] = data.index.month
     fig, ax = plt.subplots(figsize=(11, 5))
@@ -82,7 +82,7 @@ def plot_monthly_boxplot(clean: pd.DataFrame, target_col: str, output_path: str 
 
 
 def plot_monthly_mean_by_year(clean: pd.DataFrame, target_col: str, output_path: str | Path) -> Path:
-    """Vẽ PM2.5 trung bình theo tháng và năm."""
+    """Vẽ PM2.5 trung bình từng tháng cho từng năm để so sánh biến động theo mùa."""
     data = clean[[target_col]].copy()
     data["Năm"] = data.index.year
     data["Tháng"] = data.index.month
@@ -98,7 +98,7 @@ def plot_monthly_mean_by_year(clean: pd.DataFrame, target_col: str, output_path:
 
 
 def plot_correlation_heatmap(clean: pd.DataFrame, output_path: str | Path) -> Path:
-    """Vẽ heatmap tương quan giữa PM2.5 và các biến ngoại sinh."""
+    """Vẽ heatmap tương quan để nhìn nhanh quan hệ tuyến tính giữa các biến."""
     corr = clean.select_dtypes(include="number").corr(numeric_only=True)
     fig, ax = plt.subplots(figsize=(11, 8))
     sns.heatmap(corr, cmap="vlag", center=0, linewidths=0.4, annot=False, ax=ax)
@@ -108,7 +108,7 @@ def plot_correlation_heatmap(clean: pd.DataFrame, output_path: str | Path) -> Pa
 
 
 def plot_feature_importance(importances: pd.Series, output_path: str | Path, top_n: int = 20) -> Path:
-    """Vẽ các đặc trưng quan trọng nhất của Random Forest."""
+    """Vẽ top đặc trưng quan trọng nhất theo Random Forest."""
     top = importances.sort_values(ascending=True).tail(top_n)
     fig, ax = plt.subplots(figsize=(10, max(5, top_n * 0.3)))
     top.plot(kind="barh", color="#f97316", ax=ax)
@@ -120,7 +120,7 @@ def plot_feature_importance(importances: pd.Series, output_path: str | Path, top
 
 
 def plot_monthly_rmse(actual: pd.Series, predictions: dict[str, pd.Series], output_path: str | Path) -> Path:
-    """Vẽ RMSE theo tháng để so sánh sai số theo thời đoạn."""
+    """Vẽ RMSE theo tháng để xem mô hình sai nhiều vào giai đoạn nào."""
     rows = []
     for name, pred in predictions.items():
         aligned = pd.DataFrame({"actual": actual, "predicted": pred}).dropna()
@@ -141,7 +141,7 @@ def plot_monthly_rmse(actual: pd.Series, predictions: dict[str, pd.Series], outp
 
 
 def plot_error_distribution(actual: pd.Series, predictions: dict[str, pd.Series], output_path: str | Path) -> Path:
-    """Vẽ phân phối sai số dự báo của từng mô hình."""
+    """Vẽ phân phối sai số dự báo để biết mô hình hay dự báo cao/thấp ra sao."""
     rows = []
     for name, pred in predictions.items():
         aligned = pd.DataFrame({"actual": actual, "predicted": pred}).dropna()
@@ -160,7 +160,7 @@ def plot_error_distribution(actual: pd.Series, predictions: dict[str, pd.Series]
 
 
 def plot_actual_vs_predicted(actual: pd.Series, predictions: dict[str, pd.Series], output_path: str | Path) -> Path:
-    """Vẽ scatter thực tế - dự báo để đánh giá độ bám của mô hình."""
+    """Vẽ scatter thực tế - dự báo; điểm càng gần đường chéo thì dự báo càng tốt."""
     rows = []
     for name, pred in predictions.items():
         aligned = pd.DataFrame({"Thực tế": actual, "Dự báo": pred}).dropna()

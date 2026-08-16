@@ -1,4 +1,9 @@
-"""Preprocessing that preserves PM2.5 and relevant exogenous variables."""
+"""Tiền xử lý dữ liệu thô trước khi đưa vào phân tích và mô hình.
+
+Mục tiêu của bước này là chuẩn hóa tên cột, ép kiểu ngày/số, loại giá trị PM2.5
+không hợp lệ, tổng hợp dữ liệu theo ngày và nội suy các khoảng thiếu ngắn. Sau
+tiền xử lý, dữ liệu sạch vẫn giữ PM2.5 và các biến ngoại sinh có ích.
+"""
 
 from __future__ import annotations
 
@@ -20,7 +25,12 @@ def _normalize(name: str) -> str:
 
 
 def infer_column_map(raw: pd.DataFrame, config: dict) -> ColumnMap:
-    """Infer date, target, and exogenous columns from config candidates."""
+    """Tìm cột ngày, cột PM2.5 và các cột ngoại sinh trong dữ liệu thô.
+
+    Dữ liệu thô có thể đặt tên cột khác nhau, ví dụ `PM25`, `PM2.5` hoặc có dấu
+    gạch dưới. Hàm chuẩn hóa tên để so khớp với danh sách ứng viên trong config,
+    rồi trả về `ColumnMap` cho các bước chuẩn hóa tiếp theo.
+    """
     normalized = {_normalize(col): col for col in raw.columns}
     date_source = next(
         (normalized[_normalize(c)] for c in config["date_candidates"] if _normalize(c) in normalized),
@@ -44,7 +54,12 @@ def infer_column_map(raw: pd.DataFrame, config: dict) -> ColumnMap:
 
 
 def standardize_columns(raw: pd.DataFrame, config: dict) -> pd.DataFrame:
-    """Rename inferred columns to canonical names and coerce numeric values."""
+    """Chuẩn hóa cột dữ liệu về tên và kiểu dữ liệu thống nhất.
+
+    Hàm chỉ giữ các cột cần dùng, đổi cột ngày/mục tiêu về tên chuẩn trong
+    config, chuyển ngày bằng `pd.to_datetime`, chuyển các biến số bằng
+    `pd.to_numeric`, và xem PM2.5 âm là dữ liệu lỗi nên đổi thành `NaN`.
+    """
     col_map = infer_column_map(raw, config)
     target_col = config["target_col"]
     date_col = config["date_col"]
@@ -65,7 +80,12 @@ def standardize_columns(raw: pd.DataFrame, config: dict) -> pd.DataFrame:
 
 
 def aggregate_daily(df: pd.DataFrame, config: dict) -> pd.DataFrame:
-    """Aggregate hourly observations to daily means with minimum support checks."""
+    """Gộp dữ liệu quan trắc trong ngày thành giá trị trung bình ngày.
+
+    Một ngày chỉ được giữ lại nếu có đủ số quan sát PM2.5 tối thiểu
+    (`min_obs_per_day`). Sau đó hàm tạo lịch ngày liên tục và nội suy các khoảng
+    thiếu ngắn theo thời gian để chuỗi ngày phù hợp cho ARIMA và Random Forest.
+    """
     date_col = config["date_col"]
     target_col = config["target_col"]
     min_obs = int(config.get("min_obs_per_day", 12))
@@ -91,5 +111,9 @@ def aggregate_daily(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
 
 def preprocess_raw_data(raw: pd.DataFrame, config: dict) -> pd.DataFrame:
-    """Run the complete preprocessing stage."""
+    """Chạy trọn vẹn bước tiền xử lý từ dữ liệu thô đến dữ liệu sạch theo ngày.
+
+    Đây là hàm tiện ích cho pipeline chính: trước hết chuẩn hóa cột bằng
+    `standardize_columns`, sau đó tổng hợp theo ngày bằng `aggregate_daily`.
+    """
     return aggregate_daily(standardize_columns(raw, config), config)

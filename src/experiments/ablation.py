@@ -1,4 +1,4 @@
-"""Feature ablation helpers for Random Forest experiments."""
+"""Thử nghiệm ablation để xem từng nhóm đặc trưng ảnh hưởng thế nào."""
 
 from __future__ import annotations
 
@@ -16,7 +16,12 @@ def evaluate_feature_sets(
     y_test: pd.Series,
     model_params: dict,
 ) -> pd.DataFrame:
-    """Fit one RF model per feature set and compare metrics."""
+    """Huấn luyện một Random Forest cho mỗi bộ đặc trưng rồi so sánh metric.
+
+    Ablation giúp trả lời câu hỏi: nếu bỏ hoặc chỉ giữ một nhóm đặc trưng, chất
+    lượng dự báo thay đổi ra sao. Đây là cách giải thích mô hình dễ hiểu hơn cho
+    báo cáo nghiên cứu.
+    """
     rows = []
     for name, cols in feature_sets.items():
         model = RandomForestRegressor(**model_params)

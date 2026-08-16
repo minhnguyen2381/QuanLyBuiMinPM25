@@ -1,4 +1,8 @@
-"""Forecast metrics for PM2.5 experiments."""
+"""Các chỉ số đánh giá dự báo PM2.5.
+
+Module này gom các metric thường dùng như MAE, RMSE, MAPE, SMAPE, R2 và độ
+chính xác chiều tăng/giảm. Kết quả được đưa vào bảng so sánh mô hình.
+"""
 
 from __future__ import annotations
 
@@ -8,12 +12,16 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
 def align_actual_predicted(actual: pd.Series, predicted: pd.Series) -> pd.DataFrame:
-    """Align actual and predicted series and drop missing values."""
+    """Căn cùng ngày giữa chuỗi thực tế và chuỗi dự báo, rồi bỏ dòng thiếu.
+
+    Metric chỉ có ý nghĩa khi so sánh đúng cặp ngày. Hàm này tạo bảng gồm
+    `actual` và `predicted` để các metric phía dưới dùng chung một cách nhất quán.
+    """
     return pd.DataFrame({"actual": actual, "predicted": predicted}).dropna()
 
 
 def directional_accuracy(actual: pd.Series, predicted: pd.Series) -> float:
-    """Share of days where the forecast gets the direction of change right."""
+    """Tính tỷ lệ dự báo đúng chiều tăng hoặc giảm giữa hai ngày liên tiếp."""
     aligned = align_actual_predicted(actual, predicted)
     if len(aligned) < 2:
         return np.nan
@@ -23,7 +31,12 @@ def directional_accuracy(actual: pd.Series, predicted: pd.Series) -> float:
 
 
 def compute_forecast_metrics(actual: pd.Series, predicted: pd.Series, model_name: str) -> dict:
-    """Compute an expanded metric set."""
+    """Tính bộ chỉ số đánh giá cho một mô hình dự báo.
+
+    MAE/RMSE đo sai số theo đơn vị µg/m³, MAPE/SMAPE đo sai số phần trăm, R2 đo
+    mức giải thích biến thiên, còn DirectionalAccuracy kiểm tra mô hình có bắt
+    đúng xu hướng tăng/giảm hay không.
+    """
     aligned = align_actual_predicted(actual, predicted)
     if aligned.empty:
         raise ValueError(f"No overlapping observations for {model_name}.")
@@ -47,7 +60,11 @@ def compute_forecast_metrics(actual: pd.Series, predicted: pd.Series, model_name
 
 
 def compare_forecasts(actual: pd.Series, predictions: dict[str, pd.Series]) -> pd.DataFrame:
-    """Compare multiple forecast series on the same actual values."""
+    """So sánh nhiều mô hình trên cùng chuỗi PM2.5 thực tế.
+
+    Nếu có mô hình `Naive`, hàm thêm cột phần trăm cải thiện RMSE so với mốc
+    tham chiếu này để dễ đọc kết quả trong báo cáo.
+    """
     table = pd.DataFrame(
         [compute_forecast_metrics(actual, pred, name) for name, pred in predictions.items()]
     ).set_index("Model")

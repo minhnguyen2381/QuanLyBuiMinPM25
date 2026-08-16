@@ -39,7 +39,11 @@ def set_page_layout(doc: Document) -> None:
 
 
 def clear_headers_and_footers(doc: Document) -> None:
-    """Remove inherited header/footer content from the reference template."""
+    """Xóa header/footer kế thừa từ file mẫu Word.
+
+    Script dùng một file `.docx` có sẵn làm template định dạng. Nếu không xóa,
+    header/footer cũ có thể xuất hiện trong báo cáo mới và gây nhầm lẫn.
+    """
     for section in doc.sections:
         for part in [
             section.header,
@@ -152,7 +156,11 @@ def add_table(doc: Document, rows: list[list], widths: list[float] | None = None
 
 
 def add_compact_table(doc: Document, rows: list[list], widths: list[float] | None = None) -> None:
-    """Add a dense appendix table with smaller text for long statistical outputs."""
+    """Thêm bảng phụ lục dạng gọn với chữ nhỏ hơn.
+
+    Các bảng phụ lục thường nhiều dòng/cột hơn bảng chính. Hàm này giảm cỡ chữ
+    và căn ô phù hợp để nội dung dài vẫn nằm trong trang Word.
+    """
     if not rows:
         return
     table = doc.add_table(rows=len(rows), cols=len(rows[0]))
