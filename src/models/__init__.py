@@ -1,1 +1,1 @@
-"""Forecasting models used in the PM2.5 research pipeline."""
+"""Nhóm module mô hình dự báo dùng trong pipeline PM2.5."""

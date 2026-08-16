@@ -1,1 +1,1 @@
-"""Experiment helpers for repeatable PM2.5 model evaluation."""
+"""Nhóm helper phục vụ thiết kế thực nghiệm lặp lại được cho PM2.5."""
