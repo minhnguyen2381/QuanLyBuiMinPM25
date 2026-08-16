@@ -1,0 +1,5 @@
+﻿Model,MAE,RMSE,MAPE,SMAPE,R2,DirectionalAccuracy,N,Cải thiện RMSE so với mô hình tham chiếu (%)
+Mô hình tham chiếu (Naive),16.809,22.3952,31.6189,28.4787,0.4203,0.4693,180,0.0
+Tham chiếu mùa vụ 7 ngày,26.9906,36.5907,50.4545,41.308,-0.7994,0.4566,174,-63.39
+ARIMA,15.7073,21.2486,30.3311,26.0787,0.4949,0.5056,181,5.12
+Random Forest,14.4178,19.2267,26.3145,24.1048,0.5864,0.4944,181,14.15

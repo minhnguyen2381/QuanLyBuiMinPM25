@@ -1,0 +1,10 @@
+﻿,indicator,before,after
+0,raw_rows,30341.0,
+1,clean_daily_rows,,1265
+2,clean_start_date,,2022-01-13
+3,clean_end_date,,2025-06-30
+4,clean_columns,,"PM2.5, AQI, CO, NO2, O3, PM10, SO2, Clouds, Precipitation, Pressure, Relative Humidity, Temperature, UV Index, Wind Speed"
+5,target_missing_after,,0
+6,duplicate_raw_rows,0.0,
+7,target_missing_before,2.0,
+8,target_negative_before,0.0,
